@@ -1,0 +1,23 @@
+{
+  "name": "projet_libre",
+  "version": "1.0.0",
+  "description": "Free project for WEB (HEIG-VD)",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"npm run dev --prefix client\" \"node server/server.js\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shadowkudo/CryptoForge.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shadowkudo/CryptoForge/issues"
+  },
+  "homepage": "https://github.com/shadowkudo/CryptoForge#readme",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
