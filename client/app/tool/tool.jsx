@@ -1,12 +1,16 @@
 import {useEffect, useRef, useState} from 'react';
-import { Terminal } from "@xterm/xterm";
+import {Terminal} from "@xterm/xterm";
 import {FitAddon} from "@xterm/addon-fit/src/FitAddon.js";
+
+const PROMPT = '$> ';
 
 export function Tool() {
     const terminalRef = useRef(null);
     const termRef = useRef(null); // holds terminal instance
     const inputBuffer = useRef('');
-
+    const commandHistory = useRef([]);
+    const historyIndex = useRef(-1);
+    const cursorPos = useRef(0); // Position of cursor in inputBuffer
     const algorithms = ['ceasar', 'vigenere'];
 
     // currently here for tests, will be in backend later
@@ -62,6 +66,26 @@ export function Tool() {
             }
         }
         return result;
+    };
+
+    const replaceInput = (newInput) => {
+        inputBuffer.current = newInput;
+        cursorPos.current = newInput.length;
+        rewriteInput();
+    };
+
+    const rewriteInput = () => {
+        const term = termRef.current;
+
+        // Clear current line (go back, erase, go back to start)
+        const clearSeq = '\x1b[2K\r' + PROMPT;
+        term.write(clearSeq + inputBuffer.current);
+
+        // Move cursor to correct position
+        const targetOffset = inputBuffer.current.length - cursorPos.current;
+        if (targetOffset > 0) {
+            term.write('\x1b[' + targetOffset + 'D'); // move left
+        }
     };
 
     const handleCommand = (command) => {
@@ -140,7 +164,7 @@ export function Tool() {
         // Delay writing welcome message slightly to avoid layout race
         setTimeout(() => {
             term.writeln('Welcome to CryptoForge Terminal');
-            term.write('> ');
+            term.write(PROMPT);
         }, 10);
 
         term.onData((data) => {
@@ -150,18 +174,60 @@ export function Tool() {
                 // Enter
                 term.write('\r\n');
                 const cmd = inputBuffer.current.trim();
+                if (cmd) {
+                    commandHistory.current.push(cmd);
+                    historyIndex.current = commandHistory.current.length;
+                }
                 handleCommand(cmd);
                 inputBuffer.current = '';
-                term.write('> ');
+                cursorPos.current = 0;
+                term.write(PROMPT);
             } else if (code === 127) {
                 // Backspace
-                if (inputBuffer.current.length > 0) {
-                    inputBuffer.current = inputBuffer.current.slice(0, -1);
-                    term.write('\b \b');
+                if (cursorPos.current > 0) {
+                    inputBuffer.current = inputBuffer.current.slice(0, cursorPos.current - 1) +
+                        inputBuffer.current.slice(cursorPos.current);
+                    cursorPos.current--;
+
+                    // Clear line and rewrite
+                    rewriteInput();
                 }
-            } else {
-                inputBuffer.current += data;
-                term.write(data);
+            } else if (data === '\x1b[D') {
+                // LEFT ARROW
+                if (cursorPos.current > 0) {
+                    cursorPos.current--;
+                    term.write('\x1b[D'); // move cursor left
+                }
+            } else if (data === '\x1b[C') {
+                // RIGHT ARROW
+                if (cursorPos.current < inputBuffer.current.length) {
+                    cursorPos.current++;
+                    term.write('\x1b[C'); // move cursor right
+                }
+            } else if (data === '\x1b[A') {
+                // UP ARROW
+                if (historyIndex.current > 0) {
+                    historyIndex.current--;
+                    replaceInput(commandHistory.current[historyIndex.current]);
+                }
+            } else if (data === '\x1b[B') {
+                // DOWN ARROW
+                if (historyIndex.current < commandHistory.current.length - 1) {
+                    historyIndex.current++;
+                    replaceInput(commandHistory.current[historyIndex.current]);
+                } else {
+                    historyIndex.current = commandHistory.current.length;
+                    replaceInput('');
+                }
+            } else if (data >= ' ' && data <= '~') {
+                // Printable characters
+                inputBuffer.current =
+                    inputBuffer.current.slice(0, cursorPos.current) +
+                    data +
+                    inputBuffer.current.slice(cursorPos.current);
+                cursorPos.current++;
+
+                rewriteInput();
             }
         });
 
@@ -184,8 +250,10 @@ export function Tool() {
                 {/* Input Area */}
                 <div className="flex-1 flex flex-col space-y-1">
                     <div className="flex justify-between">
-                        <button className="text-sm px-2 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">Btn</button>
-                        <button className="text-sm px-2 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">Btn</button>
+                        <button className="text-sm px-2 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">Btn
+                        </button>
+                        <button className="text-sm px-2 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">Btn
+                        </button>
                     </div>
                     <textarea
                         placeholder="Input text"
@@ -196,8 +264,10 @@ export function Tool() {
                 {/* Output Area */}
                 <div className="flex-1 flex flex-col space-y-1">
                     <div className="flex justify-between">
-                        <button className="text-sm px-2 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">Btn</button>
-                        <button className="text-sm px-2 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">Btn</button>
+                        <button className="text-sm px-2 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">Btn
+                        </button>
+                        <button className="text-sm px-2 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">Btn
+                        </button>
                     </div>
                     <textarea
                         placeholder="Output text"
