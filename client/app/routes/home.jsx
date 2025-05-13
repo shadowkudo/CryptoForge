@@ -1,12 +1,12 @@
-import { Welcome } from "../welcome/welcome";
+import { Tool } from "../tool/tool";
 
 export function meta() {
   return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
+    { title: "CryptoForge" },
+    { name: "description", content: "Forge your message!" },
   ];
 }
 
 export default function Home() {
-  return <Welcome />;
+  return <Tool />;
 }

@@ -5,9 +5,11 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  Link
 } from "react-router";
 
 import "./app.css";
+import {useEffect, useState} from "react";
 
 export const links = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -20,9 +22,22 @@ export const links = () => [
     rel: "stylesheet",
     href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
   },
+  {
+    rel: "stylesheet",
+    href: "node_modules/@xterm/xterm/css/xterm.css",
+  },
 ];
 
 export function Layout({ children }) {
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formattedTime = time.toLocaleString();
+
   return (
     <html lang="en">
       <head>
@@ -31,10 +46,23 @@ export function Layout({ children }) {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="h-screen flex flex-col">
+      <nav className="p-4 bg-gray-100 dark:bg-gray-800 flex gap-4">
+        <Link to="/" className="text-blue-700 dark:text-blue-300 hover:underline">
+          Home
+        </Link>
+        <Link to="/about" className="text-blue-700 dark:text-blue-300 hover:underline">
+          About Us
+        </Link>
+      </nav>
+      <main className="flex-1 overflow-hidden">
         {children}
-        <ScrollRestoration />
-        <Scripts />
+      </main>
+      <footer className="bg-gray-200 dark:bg-gray-900 text-center text-sm p-4 text-gray-800 dark:text-gray-300">
+        {`Current date and time: ${formattedTime}`}
+      </footer>
+      <ScrollRestoration />
+      <Scripts />
       </body>
     </html>
   );
