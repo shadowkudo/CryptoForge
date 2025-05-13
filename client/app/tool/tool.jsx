@@ -4,6 +4,61 @@ import {FitAddon} from "@xterm/addon-fit/src/FitAddon.js";
 
 const PROMPT = '$> ';
 
+// currently here for tests, will be in backend later
+const ceasarEncrypt = (text, key) => {
+    const shift = parseInt(key, 10) || 0;
+    return text
+        .split('')
+        .map(char => {
+            if (/[a-z]/.test(char)) {
+                return String.fromCharCode((char.charCodeAt(0) - 97 + shift) % 26 + 97);
+            } else if (/[A-Z]/.test(char)) {
+                return String.fromCharCode((char.charCodeAt(0) - 65 + shift) % 26 + 65);
+            } else {
+                return char;
+            }
+        })
+        .join('');
+};
+
+const ceasarDecrypt = (text, key) => ceasarEncrypt(text, 26 - (parseInt(key, 10) % 26));
+
+const vigenereEncrypt = (text, key) => {
+    let result = '';
+    key = key.toLowerCase();
+    let keyIndex = 0;
+    for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        if (/[a-zA-Z]/.test(c)) {
+            const base = c === c.toLowerCase() ? 97 : 65;
+            const shift = key.charCodeAt(keyIndex % key.length) - 97;
+            result += String.fromCharCode((c.charCodeAt(0) - base + shift) % 26 + base);
+            keyIndex++;
+        } else {
+            result += c;
+        }
+    }
+    return result;
+};
+
+const vigenereDecrypt = (text, key) => {
+    let result = '';
+    key = key.toLowerCase();
+    let keyIndex = 0;
+    for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        if (/[a-zA-Z]/.test(c)) {
+            const base = c === c.toLowerCase() ? 97 : 65;
+            const shift = key.charCodeAt(keyIndex % key.length) - 97;
+            result += String.fromCharCode((c.charCodeAt(0) - base - shift + 26) % 26 + base);
+            keyIndex++;
+        } else {
+            result += c;
+        }
+    }
+    return result;
+};
+
 export function Tool() {
     const terminalRef = useRef(null);
     const termRef = useRef(null); // holds terminal instance
@@ -11,62 +66,10 @@ export function Tool() {
     const commandHistory = useRef([]);
     const historyIndex = useRef(-1);
     const cursorPos = useRef(0); // Position of cursor in inputBuffer
+    const [inputText, setInputText] = useState(''); // Input state for the text area
+    const inputTextRef = useRef('');
+    const [outputText, setOutputText] = useState(''); // Output state for the text area
     const algorithms = ['ceasar', 'vigenere'];
-
-    // currently here for tests, will be in backend later
-    const ceasarEncrypt = (text, key) => {
-        const shift = parseInt(key, 10) || 0;
-        return text
-            .split('')
-            .map(char => {
-                if (/[a-z]/.test(char)) {
-                    return String.fromCharCode((char.charCodeAt(0) - 97 + shift) % 26 + 97);
-                } else if (/[A-Z]/.test(char)) {
-                    return String.fromCharCode((char.charCodeAt(0) - 65 + shift) % 26 + 65);
-                } else {
-                    return char;
-                }
-            })
-            .join('');
-    };
-
-    const ceasarDecrypt = (text, key) => ceasarEncrypt(text, 26 - (parseInt(key, 10) % 26));
-
-    const vigenereEncrypt = (text, key) => {
-        let result = '';
-        key = key.toLowerCase();
-        let keyIndex = 0;
-        for (let i = 0; i < text.length; i++) {
-            const c = text[i];
-            if (/[a-zA-Z]/.test(c)) {
-                const base = c === c.toLowerCase() ? 97 : 65;
-                const shift = key.charCodeAt(keyIndex % key.length) - 97;
-                result += String.fromCharCode((c.charCodeAt(0) - base + shift) % 26 + base);
-                keyIndex++;
-            } else {
-                result += c;
-            }
-        }
-        return result;
-    };
-
-    const vigenereDecrypt = (text, key) => {
-        let result = '';
-        key = key.toLowerCase();
-        let keyIndex = 0;
-        for (let i = 0; i < text.length; i++) {
-            const c = text[i];
-            if (/[a-zA-Z]/.test(c)) {
-                const base = c === c.toLowerCase() ? 97 : 65;
-                const shift = key.charCodeAt(keyIndex % key.length) - 97;
-                result += String.fromCharCode((c.charCodeAt(0) - base - shift + 26) % 26 + base);
-                keyIndex++;
-            } else {
-                result += c;
-            }
-        }
-        return result;
-    };
 
     const replaceInput = (newInput) => {
         inputBuffer.current = newInput;
@@ -89,79 +92,94 @@ export function Tool() {
     };
 
     const handleCommand = (command) => {
-            const term = termRef.current;
-            const write = (text) => term.writeln(text);
+        const term = termRef.current;
+        const write = (text) => term.writeln(text);
 
-            const cleanCmd = command.trim();
+        const cleanCmd = command.trim();
 
-            if (cleanCmd === 'help') {
-                const helpLines = [
-                    'Available commands:',
-                    '  clear                        Clear the terminal',
-                    '  help                         Show this help',
-                    '  list                         List supported algorithms',
-                    '  encrypt -a <algo> -k <key>   Encrypt input to output',
-                    '  decrypt -a <algo> -k <key>   Decrypt input to output',
-                ];
+        if (cleanCmd === 'help') {
+            const helpLines = [
+                'Available commands:',
+                '  clear                        Clear the terminal',
+                '  help                         Show this help',
+                '  list                         List supported algorithms',
+                '  encrypt -a <algo> -k <key>   Encrypt input to output',
+                '  decrypt -a <algo> -k <key>   Decrypt input to output',
+            ];
 
-                helpLines.forEach(line => term.writeln(line));
-            } else if (cleanCmd === 'clear') {
-                term.clear();
-            } else if (cleanCmd === 'list') {
-                write('Supported algorithms: ' + algorithms.join(', '));
-            } else if (cleanCmd.startsWith('encrypt')) {
-                const match = cleanCmd.match(/-a\s+(\w+)\s+-k\s+(\w+)/);
-                if (!match) {
-                    write('Usage: encrypt -a <algo> -k <key>');
-                    return;
-                }
-                const algo = match[1];
-                const key = match[2];
-                const input = 'HelloWorld';
-
-                let result;
-                if (algo === 'ceasar') result = ceasarEncrypt(input, key);
-                else if (algo === 'vigenere') result = vigenereEncrypt(input, key);
-                else {
-                    write(`Unknown algorithm: ${algo}`);
-                    return;
-                }
-
-                write(`Encrypted "${input}": ${result}`);
-            } else if (cleanCmd.startsWith('decrypt')) {
-                const match = cleanCmd.match(/-a\s+(\w+)\s+-k\s+(\w+)/);
-                if (!match) {
-                    write('Usage: decrypt -a <algo> -k <key>');
-                    return;
-                }
-                const algo = match[1];
-                const key = match[2];
-                const input = 'EncryptedTextHere'; // hardcoded unless added input zone
-
-                let result;
-                if (algo === 'ceasar') result = ceasarDecrypt(input, key);
-                else if (algo === 'vigenere') result = vigenereDecrypt(input, key);
-                else {
-                    write(`Unknown algorithm: ${algo}`);
-                    return;
-                }
-
-                write(`Decrypted "${input}": ${result}`);
-            } else {
-                write(`Unknown command: ${command}`);
+            helpLines.forEach(line => term.writeln(line));
+        } else if (cleanCmd === 'clear') {
+            term.clear();
+        } else if (cleanCmd === 'list') {
+            write('Supported algorithms: ' + algorithms.join(', '));
+        } else if (cleanCmd.startsWith('encrypt') || cleanCmd.startsWith('decrypt')) {
+            // Check if the textarea is empty
+            console.log(`Input textarea is ${inputTextRef.current}`);
+            if (!inputTextRef.current.trim()) {
+                write('Warning: No input text provided!');
+                return; // Stop further processing
             }
+
+            const match = cleanCmd.match(/-a\s+(\w+)\s+-k\s+(\w+)/);
+            if (!match) {
+                write(`Usage: ${cleanCmd.startsWith('encrypt') ? 'encrypt' : 'decrypt'} -a <algo> -k <key>`);
+                return;
+            }
+            const algo = match[1];
+            const key = match[2];
+            const message = inputTextRef.current;  // Get the input from the textarea
+
+            let result;
+            if (cleanCmd.startsWith('encrypt')) {
+                if (algo === 'ceasar') result = ceasarEncrypt(message, key);
+                else if (algo === 'vigenere') result = vigenereEncrypt(message, key);
+                else {
+                    write(`Unknown algorithm: ${algo}`);
+                    return;
+                }
+
+                // Update the output textarea and terminal
+                setOutputText(result);
+                write(`Cipher done.`);
+            } else if (cleanCmd.startsWith('decrypt')) {
+                if (algo === 'ceasar') result = ceasarDecrypt(message, key);
+                else if (algo === 'vigenere') result = vigenereDecrypt(message, key);
+                else {
+                    write(`Unknown algorithm: ${algo}`);
+                    return;
+                }
+
+                // Update the output textarea and terminal
+                setOutputText(result);
+                write(`Decipher done.`);
+            }
+        } else {
+            write(`Unknown command: ${command}`);
         }
-    ;
+    };
 
     useEffect(() => {
         const term = new Terminal({cursorBlink: true});
         const fitAddon = new FitAddon();
+
         term.loadAddon(fitAddon);
         termRef.current = term;
-        term.open(terminalRef.current);
-        fitAddon.fit();
-        window.addEventListener("resize", fitAddon.fit);
-        // Delay writing welcome message slightly to avoid layout race
+
+        if (terminalRef.current) {
+            term.open(terminalRef.current); // Open the terminal
+            fitAddon.fit(); // Adjust the size
+        }
+
+        const resizeListener = () => {
+            if (term) {
+                fitAddon.fit(); // Adjust terminal size when the window is resized
+            }
+        };
+
+        // Add event listener for resize
+        window.addEventListener("resize", resizeListener);
+
+        // Write initial message after a slight delay to avoid race conditions
         setTimeout(() => {
             term.writeln('Welcome to CryptoForge Terminal');
             term.write(PROMPT);
@@ -233,7 +251,7 @@ export function Tool() {
 
         return () => {
             term.dispose(); // cleanup
-            window.removeEventListener("resize", fitAddon.fit);
+            window.removeEventListener("resize", resizeListener);
         };
     }, []);
 
@@ -256,6 +274,11 @@ export function Tool() {
                         </button>
                     </div>
                     <textarea
+                        value={inputText}
+                        onChange={(e) => {
+                            setInputText(e.target.value);
+                            inputTextRef.current = e.target.value;
+                        }}
                         placeholder="Input text"
                         className="flex-1 resize-none p-2 bg-gray-800 text-white rounded border border-gray-600"
                     />
@@ -270,6 +293,7 @@ export function Tool() {
                         </button>
                     </div>
                     <textarea
+                        value={outputText}
                         placeholder="Output text"
                         className="flex-1 resize-none p-2 bg-gray-800 text-white rounded border border-gray-600"
                         readOnly
