@@ -1,3 +1,4 @@
+import { useOutletContext } from "react-router";
 import { Tool } from "../tool/tool";
 
 export function meta() {
@@ -8,5 +9,6 @@ export function meta() {
 }
 
 export default function Home() {
-  return <Tool />;
+  const { isDark } = useOutletContext();
+  return <Tool isDark={isDark} />;
 }

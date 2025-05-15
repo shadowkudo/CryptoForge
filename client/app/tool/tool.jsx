@@ -1,6 +1,12 @@
 import {useEffect, useRef, useState} from 'react';
 import {Terminal} from "@xterm/xterm";
 import {FitAddon} from "@xterm/addon-fit/src/FitAddon.js";
+import {
+    ArrowUpOutlined,
+    CopyOutlined,
+    DownloadOutlined, RestOutlined,
+    UploadOutlined
+} from '@ant-design/icons';
 
 const PROMPT = '$> ';
 
@@ -59,7 +65,46 @@ const vigenereDecrypt = (text, key) => {
     return result;
 };
 
-export function Tool() {
+const darkTheme = {
+    background: '#000000',
+    foreground: '#ffffff',
+    cursor: '#ffffff',
+    black: '#000000',
+    red: '#ff5555',
+    green: '#50fa7b',
+    yellow: '#f1fa8c',
+    blue: '#bd93f9',
+    magenta: '#ff79c6',
+    cyan: '#8be9fd',
+    white: '#bbbbbb',
+    brightBlack: '#555555',
+    brightWhite: '#ffffff',
+};
+
+const lightTheme = {
+    background: '#ffffff',
+    foreground: '#000000',
+    cursor: '#000000',
+    black: '#000000',
+    red: '#ff5555',
+    green: '#50fa7b',
+    yellow: '#f1fa8c',
+    blue: '#bd93f9',
+    magenta: '#ff79c6',
+    cyan: '#8be9fd',
+    white: '#444444',
+    brightBlack: '#aaaaaa',
+    brightWhite: '#000000',
+};
+
+const maskKeyInCommand = (cmd) => {
+    return cmd.replace(/(-k\s+)(\S+)/, (_, flag, val) => { // format key is -k <key>
+        return flag + '*'.repeat(Math.min(val.length, 6));
+    });
+};
+
+
+export function Tool({isDark}) {
     const terminalRef = useRef(null);
     const termRef = useRef(null); // holds terminal instance
     const inputBuffer = useRef('');
@@ -69,7 +114,7 @@ export function Tool() {
     const [inputText, setInputText] = useState(''); // Input state for the text area
     const inputTextRef = useRef('');
     const [outputText, setOutputText] = useState(''); // Output state for the text area
-    const algorithms = ['ceasar', 'vigenere'];
+    const algorithms = ['ceasar', 'vigenere']; // for now hard coded but should be from backend later
 
     const replaceInput = (newInput) => {
         inputBuffer.current = newInput;
@@ -80,12 +125,15 @@ export function Tool() {
     const rewriteInput = () => {
         const term = termRef.current;
 
-        // Clear current line (go back, erase, go back to start)
-        const clearSeq = '\x1b[2K\r' + PROMPT;
-        term.write(clearSeq + inputBuffer.current);
+        // Mask key before displaying
+        const displayInput = maskKeyInCommand(inputBuffer.current);
 
-        // Move cursor to correct position
-        const targetOffset = inputBuffer.current.length - cursorPos.current;
+        // Clear line and write prompt + masked input
+        const clearSeq = '\x1b[2K\r' + PROMPT;
+        term.write(clearSeq + displayInput);
+
+        // Move cursor to correct position (relative to actual input length)
+        const targetOffset = displayInput.length - cursorPos.current;
         if (targetOffset > 0) {
             term.write('\x1b[' + targetOffset + 'D'); // move left
         }
@@ -113,11 +161,9 @@ export function Tool() {
         } else if (cleanCmd === 'list') {
             write('Supported algorithms: ' + algorithms.join(', '));
         } else if (cleanCmd.startsWith('encrypt') || cleanCmd.startsWith('decrypt')) {
-            // Check if the textarea is empty
-            console.log(`Input textarea is ${inputTextRef.current}`);
             if (!inputTextRef.current.trim()) {
                 write('Warning: No input text provided!');
-                return; // Stop further processing
+                return;
             }
 
             const match = cleanCmd.match(/-a\s+(\w+)\s+-k\s+(\w+)/);
@@ -127,7 +173,7 @@ export function Tool() {
             }
             const algo = match[1];
             const key = match[2];
-            const message = inputTextRef.current;  // Get the input from the textarea
+            const message = inputTextRef.current;
 
             let result;
             if (cleanCmd.startsWith('encrypt')) {
@@ -138,7 +184,6 @@ export function Tool() {
                     return;
                 }
 
-                // Update the output textarea and terminal
                 setOutputText(result);
                 write(`Cipher done.`);
             } else if (cleanCmd.startsWith('decrypt')) {
@@ -149,7 +194,6 @@ export function Tool() {
                     return;
                 }
 
-                // Update the output textarea and terminal
                 setOutputText(result);
                 write(`Decipher done.`);
             }
@@ -158,21 +202,46 @@ export function Tool() {
         }
     };
 
-    useEffect(() => {
-        const term = new Terminal({cursorBlink: true});
-        const fitAddon = new FitAddon();
+    const downloadOutput = () => {
+        //TODO
+    };
 
-        term.loadAddon(fitAddon);
+    const copyRaw = () => {
+        //TODO
+    };
+
+    const outputToInput = () => {
+        //TODO
+    };
+
+    const uploadInput = () => {
+        //TODO
+    };
+
+    const cleanTextarea = () => {
+        //TODO
+    };
+
+
+    useEffect(() => {
+        // initialize terminal once
+        const term = new Terminal({
+            cursorBlink: true,
+            theme: isDark ? darkTheme : lightTheme,
+        });
         termRef.current = term;
 
+        const fitAddon = new FitAddon();
+        term.loadAddon(fitAddon);
+
         if (terminalRef.current) {
-            term.open(terminalRef.current); // Open the terminal
-            fitAddon.fit(); // Adjust the size
+            term.open(terminalRef.current);
+            fitAddon.fit();
         }
 
         const resizeListener = () => {
             if (term) {
-                fitAddon.fit(); // Adjust terminal size when the window is resized
+                fitAddon.fit();
             }
         };
 
@@ -255,23 +324,34 @@ export function Tool() {
         };
     }, []);
 
+    useEffect(() => {
+        termRef.current.options.theme = isDark ? darkTheme : lightTheme;
+    }, [isDark]);
+
+
     return (
         <div className="flex h-full w-full">
             {/* Terminal */}
             <div
                 ref={terminalRef}
-                className="w-2/3 h-full bg-black text-white p-2"
+                className="w-2/3 h-full bg-gray-100 dark:bg-black text-black dark:text-white p-2"
             ></div>
 
             {/* Right Panel: Input & Output textareas */}
-            <div className="w-1/3 h-full flex flex-col pl-2 space-y-2">
+            <div className="w-1/3 h-full flex flex-col pl-2 space-y-2 mr-4">
                 {/* Input Area */}
                 <div className="flex-1 flex flex-col space-y-1">
-                    <div className="flex justify-between">
-                        <button className="text-sm px-2 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">Btn
-                        </button>
-                        <button className="text-sm px-2 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">Btn
-                        </button>
+                    <div className="flex justify-end space-x-4 mt-2">
+                        <UploadOutlined
+                            onClick={uploadInput}
+                            style={{ fontSize: 20, cursor: 'pointer', color: isDark ? '#fff' : '#000' }}
+                            title="Upload input from a file"
+                        />
+                        <RestOutlined
+                            onClick={cleanTextarea}
+                            style={{ fontSize: 20, cursor: 'pointer', color: isDark ? '#fff' : '#000' }}
+                            title="Clean input"
+                        />
                     </div>
                     <textarea
                         value={inputText}
@@ -280,22 +360,38 @@ export function Tool() {
                             inputTextRef.current = e.target.value;
                         }}
                         placeholder="Input text"
-                        className="flex-1 resize-none p-2 bg-gray-800 text-white rounded border border-gray-600"
+                        className="flex-1 resize-none p-2 bg-white dark:bg-gray-800 text-black dark:text-white rounded border border-gray-300 dark:border-gray-600"
                     />
                 </div>
 
                 {/* Output Area */}
                 <div className="flex-1 flex flex-col space-y-1">
-                    <div className="flex justify-between">
-                        <button className="text-sm px-2 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">Btn
-                        </button>
-                        <button className="text-sm px-2 py-1 bg-gray-700 text-white rounded hover:bg-gray-600">Btn
-                        </button>
+                    <div className="flex justify-end space-x-4">
+                        <ArrowUpOutlined
+                            onClick={outputToInput}
+                            style={{ fontSize: 20, cursor: 'pointer', color: isDark ? '#fff' : '#000' }}
+                            title="Put output to input"
+                        />
+                        <CopyOutlined
+                            onClick={copyRaw}
+                            style={{ fontSize: 20, cursor: 'pointer', color: isDark ? '#fff' : '#000' }}
+                            title="Copy raw output"
+                        />
+                        <DownloadOutlined
+                            onClick={downloadOutput}
+                            style={{ fontSize: 20, cursor: 'pointer', color: isDark ? '#fff' : '#000' }}
+                            title="Download output as a file"
+                        />
+                        <RestOutlined
+                            onClick={cleanTextarea}
+                            style={{ fontSize: 20, cursor: 'pointer', color: isDark ? '#fff' : '#000' }}
+                            title="Clean output"
+                        />
                     </div>
                     <textarea
                         value={outputText}
                         placeholder="Output text"
-                        className="flex-1 resize-none p-2 bg-gray-800 text-white rounded border border-gray-600"
+                        className="flex-1 resize-none p-2 bg-white dark:bg-gray-800 text-black dark:text-white rounded border border-gray-300 dark:border-gray-600"
                         readOnly
                     />
                 </div>
