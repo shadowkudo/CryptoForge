@@ -11,6 +11,7 @@ import {
 import {useEffect, useState} from "react";
 import {Switch} from "antd";
 import "./app.css";
+import {MoonOutlined, SunOutlined} from "@ant-design/icons";
 
 export const links = () => [
     {rel: "preconnect", href: "https://fonts.googleapis.com"},
@@ -61,12 +62,17 @@ function Layout({children, isDark, setIsDark}) {
                         </Link>
                     </div>
                     <div className="flex items-center gap-2">
-                        <span>{isDark ? "Dark Mode" : "Light Mode"}</span>
                         <Switch
                             checked={isDark}
                             onChange={setIsDark}
-                            checkedChildren="Dark"
-                            unCheckedChildren="Light"
+                            checkedChildren={<SunOutlined style={{fontSize: 20}}/>}
+                            unCheckedChildren={<MoonOutlined style={{fontSize: 20}}/>}
+                            style={{
+                                backgroundColor: isDark ? '#6366F1' : '#6B7280',
+                                borderColor: 'transparent',
+                                transition: 'background-color 0.3s ease'
+                            }}
+
                         />
                     </div>
                 </nav>
@@ -127,15 +133,38 @@ export function ErrorBoundary() {
         stack = error.stack;
     }
 
+    const getInitialDarkMode = () => {
+        if (typeof window === "undefined") return false;
+        const stored = localStorage.getItem("theme");
+        if (stored) return stored === "dark";
+        return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    };
+
+    const [isDark] = useState(getInitialDarkMode);
+
+    useEffect(() => {
+        const root = document.documentElement;
+        root.classList.toggle("dark", isDark);
+        localStorage.setItem("theme", isDark ? "dark" : "light");
+    }, [isDark]);
+
     return (
-        <main className="pt-16 p-4 container mx-auto text-black dark:text-white bg-white dark:bg-black">
-            <h1 className="text-2xl font-bold mb-2">{message}</h1>
-            <p>{details}</p>
-            {stack && (
-                <pre className="w-full p-4 overflow-x-auto bg-gray-100 dark:bg-gray-800 rounded">
-          <code className="text-sm font-mono text-gray-900 dark:text-gray-100">{stack}</code>
-        </pre>
-            )}
-        </main>
+        <>
+            <Meta/>
+            <Links/>
+            <main className="bg-white dark:bg-black text-black dark:text-white h-full w-full">
+                <div className="pt-16 p-4 container mx-auto">
+                    <h1>{message}</h1>
+                    <p>{details}</p>
+                    {stack && (
+                        <pre className="w-full p-4 overflow-x-auto">
+                        <code>{stack}</code>
+                    </pre>
+                    )}
+                </div>
+            </main>
+            <ScrollRestoration/>
+            <Scripts/>
+        </>
     );
 }

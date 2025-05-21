@@ -69,6 +69,7 @@ const darkTheme = {
     background: '#000000',
     foreground: '#ffffff',
     cursor: '#ffffff',
+    selectionBackground: '#555555',
     black: '#000000',
     red: '#ff5555',
     green: '#50fa7b',
@@ -85,6 +86,7 @@ const lightTheme = {
     background: '#ffffff',
     foreground: '#000000',
     cursor: '#000000',
+    selectionBackground: '#aaaaaa',
     black: '#000000',
     red: '#ff5555',
     green: '#50fa7b',
@@ -334,7 +336,7 @@ export function Tool({isDark}) {
             {/* Terminal */}
             <div
                 ref={terminalRef}
-                className="w-2/3 h-full bg-gray-100 dark:bg-black text-black dark:text-white p-2"
+                className="w-2/3 h-full border-t-2 border-r-2 border-indigo-700 dark:border-indigo-700 p-2"
             ></div>
 
             {/* Right Panel: Input & Output textareas */}
