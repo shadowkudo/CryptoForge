@@ -7,10 +7,10 @@ export default defineConfig({
   server: {
     port: 2705,
   },
-  optimizeDeps: {
+  optimizeDeps: { // to comment for prod
     include: ['@xterm/xterm']
   },
-  resolve: {
+  resolve: { // to comment for prod
     alias: {
       '@xterm/xterm': '@xterm/xterm/lib/xterm.js', // force the ESM entry
     }

@@ -1,23 +1,38 @@
 import {
-    isRouteErrorResponse,
     Links,
     Meta,
     Outlet,
     Scripts,
     ScrollRestoration,
-    Link,
-    useRouteError,
+    useRouteLoaderData, data, useFetcher, useLoaderData,
 } from "react-router";
-import {useEffect, useState} from "react";
-import {Switch} from "antd";
+import React, {useEffect, useState} from "react";
 import "./app.css";
-import {MoonOutlined, SunOutlined} from "@ant-design/icons";
+//import '@xterm/xterm/css/xterm.css'; // comment for dev
+import '@ant-design/v5-patch-for-react-19';
+import {getColorScheme, schema, setColorScheme} from "./ssr/color-scheme-cookie.js";
+import ErrorPage from "./components/errorPage.jsx";
+import MainNav from "./components/mainNav.jsx";
+import Footer from "./components/footer.jsx";
+
+export async function loader({request}) {
+    let colorScheme = await getColorScheme(request);
+    return {colorScheme};
+}
+
+export async function action({request}) {
+    let formData = await request.formData();
+    let colorScheme = schema.parse(formData.get("color-scheme"));
+    return data(null, {
+        headers: {"Set-Cookie": await setColorScheme(colorScheme)},
+    });
+}
 
 export const links = () => [
     {rel: "preconnect", href: "https://fonts.googleapis.com"},
     {rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous"},
     {rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"},
-    {rel: "stylesheet", href: "node_modules/@xterm/xterm/css/xterm.css"},
+    {rel: "stylesheet", href: "node_modules/@xterm/xterm/css/xterm.css"}, // comment for prod
 ];
 
 export const meta = () => [
@@ -25,146 +40,100 @@ export const meta = () => [
     {name: "description", content: "Forge your message!"},
 ];
 
-function Layout({children, isDark, setIsDark}) {
-    const [time, setTime] = useState(new Date());
+export function AppShell({children, colorScheme}) {
+    return (
+        <html lang="en" className={colorScheme ?? "system"}>
+        <head>
+            <meta charSet="utf-8"/>
+            <meta name="viewport" content="width=device-width, initial-scale=1"/>
+            <Meta/>
+            <Links/>
+        </head>
+        <body>
+        {children}
+        <ScrollRestoration/>
+        <Scripts/>
+        </body>
+        </html>
+    );
+}
+
+function Layout({children, initScheme}) {
+    const [isDark, setIsDark] = useState(() => {
+        // Initialize state immediately on first render
+        if (initScheme === "dark") return true;
+        if (initScheme === "light") return false;
+        return null; // system
+    });
 
     useEffect(() => {
-        const root = document.documentElement;
-        if (isDark) {
-            root.classList.add("dark");
-            localStorage.setItem("theme", "dark");
-        } else {
-            root.classList.remove("dark");
-            localStorage.setItem("theme", "light");
+        if (isDark === null) {
+            // For system, listen to changes in system preference
+            const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+            const handleChange = (e) => setIsDark(e.matches);
+            // Set initial system preference once
+            setIsDark(mediaQuery.matches);
+            // Listen to changes
+            mediaQuery.addEventListener("change", handleChange);
+            return () => mediaQuery.removeEventListener("change", handleChange);
         }
     }, [isDark]);
 
     useEffect(() => {
-        const timer = setInterval(() => setTime(new Date()), 1000);
-        return () => clearInterval(timer);
-    }, []);
+        const root = document.documentElement;
+        root.classList.remove("light", "dark", "system");
+        if (initScheme === "system" && isDark === null) {
+            root.classList.add("system");
+        } else if (isDark) {
+            root.classList.add("dark");
+        } else {
+            root.classList.add("light");
+        }
+    }, [isDark, initScheme]);
 
-    const formattedTime = time.toLocaleString();
+    const fetcher = useFetcher();
+
+    const handleChange = (checked) => {
+        setIsDark(checked);
+        const scheme = checked ? "dark" : "light";
+
+        fetcher.submit(
+            {"color-scheme": scheme},
+            {method: "post", action: "/"}
+        );
+    };
+
+    const theme = (initScheme === "system" && isDark === null) ? "system" : isDark ? "dark" : "light";
 
     return (
         <>
-            <Meta/>
-            <Links/>
             <div className="flex flex-col h-screen overflow-hidden">
-                <nav
-                    className="p-4 flex gap-4 items-center justify-between bg-white dark:bg-black text-black dark:text-white border-b border-gray-300 dark:border-gray-700">
-                    <div className="flex gap-4">
-                        <Link to="/" className="hover:underline">
-                            Home
-                        </Link>
-                        <Link to="/about" className="hover:underline">
-                            About
-                        </Link>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <Switch
-                            checked={isDark}
-                            onChange={setIsDark}
-                            checkedChildren={<SunOutlined style={{fontSize: 20}}/>}
-                            unCheckedChildren={<MoonOutlined style={{fontSize: 20}}/>}
-                            style={{
-                                backgroundColor: isDark ? '#6366F1' : '#6B7280',
-                                borderColor: 'transparent',
-                                transition: 'background-color 0.3s ease'
-                            }}
-
-                        />
-                    </div>
-                </nav>
+                <MainNav isDark={isDark} handleChange={handleChange} />
 
                 <main
                     className="flex-1 overflow-auto bg-white dark:bg-black text-black dark:text-white min-h-[calc(100vh-104px)]">
                     {children}
+                    <Outlet context={{theme}}/>
                 </main>
 
-                <footer
-                    className="bg-white dark:bg-black text-black dark:text-white text-center p-4 text-sm border-t border-gray-300 dark:border-gray-700">
-                    {`Current date and time: ${formattedTime}`}
-                </footer>
+                <Footer />
             </div>
-
-            <ScrollRestoration/>
-            <Scripts/>
         </>
     );
 }
 
 export default function App() {
-    // get initial dark mode with fallback to system preference
-    const getInitialDarkMode = () => {
-        if (typeof window !== "undefined") {
-            const stored = localStorage.getItem("theme");
-            if (stored === "dark") return true;
-            if (stored === "light") return false;
-            return window.matchMedia("(prefers-color-scheme: dark)").matches;
-        }
-        return false;
-    };
-
-    const [isDark, setIsDark] = useState(getInitialDarkMode);
+    const {colorScheme} = useRouteLoaderData("root") ?? {colorScheme: "system"};
 
     return (
-        <Layout isDark={isDark} setIsDark={setIsDark}>
-            <Outlet context={{isDark, setIsDark}}/>
-        </Layout>
+        <AppShell colorScheme={colorScheme}>
+            <Layout initScheme={colorScheme}/>
+        </AppShell>
     );
 }
 
 export function ErrorBoundary() {
-    const error = useRouteError();
-
-    let message = "Oops!";
-    let details = "An unexpected error occurred.";
-    let stack;
-
-    if (isRouteErrorResponse(error)) {
-        message = error.status === 404 ? "404" : "Error";
-        details =
-            error.status === 404
-                ? "The requested page could not be found."
-                : error.statusText || details;
-    } else if (import.meta.env.DEV && error instanceof Error) {
-        details = error.message;
-        stack = error.stack;
-    }
-
-    const getInitialDarkMode = () => {
-        if (typeof window === "undefined") return false;
-        const stored = localStorage.getItem("theme");
-        if (stored) return stored === "dark";
-        return window.matchMedia("(prefers-color-scheme: dark)").matches;
-    };
-
-    const [isDark] = useState(getInitialDarkMode);
-
-    useEffect(() => {
-        const root = document.documentElement;
-        root.classList.toggle("dark", isDark);
-        localStorage.setItem("theme", isDark ? "dark" : "light");
-    }, [isDark]);
-
     return (
-        <>
-            <Meta/>
-            <Links/>
-            <main className="bg-white dark:bg-black text-black dark:text-white h-full w-full">
-                <div className="pt-16 p-4 container mx-auto">
-                    <h1>{message}</h1>
-                    <p>{details}</p>
-                    {stack && (
-                        <pre className="w-full p-4 overflow-x-auto">
-                        <code>{stack}</code>
-                    </pre>
-                    )}
-                </div>
-            </main>
-            <ScrollRestoration/>
-            <Scripts/>
-        </>
+        <ErrorPage />
     );
 }

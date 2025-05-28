@@ -1,5 +1,7 @@
 import {useEffect, useRef, useState} from 'react';
-import {Terminal} from "@xterm/xterm";
+import {Terminal} from "@xterm/xterm"; // comment for prod
+/*import xtermPkg from "@xterm/xterm"; // comment for dev
+const { Terminal } = xtermPkg;*/
 import {FitAddon} from "@xterm/addon-fit/src/FitAddon.js";
 import {
     ArrowUpOutlined,
@@ -105,8 +107,7 @@ const maskKeyInCommand = (cmd) => {
     });
 };
 
-
-export function Tool({isDark}) {
+export function Term({ theme }) {
     const terminalRef = useRef(null);
     const termRef = useRef(null); // holds terminal instance
     const inputBuffer = useRef('');
@@ -117,6 +118,7 @@ export function Tool({isDark}) {
     const inputTextRef = useRef('');
     const [outputText, setOutputText] = useState(''); // Output state for the text area
     const algorithms = ['ceasar', 'vigenere']; // for now hard coded but should be from backend later
+    const resolvedTheme = theme === "dark";
 
     const replaceInput = (newInput) => {
         inputBuffer.current = newInput;
@@ -229,32 +231,17 @@ export function Tool({isDark}) {
         // initialize terminal once
         const term = new Terminal({
             cursorBlink: true,
-            theme: isDark ? darkTheme : lightTheme,
+            theme: resolvedTheme ? darkTheme : lightTheme,
         });
         termRef.current = term;
 
         const fitAddon = new FitAddon();
         term.loadAddon(fitAddon);
 
-        if (terminalRef.current) {
-            term.open(terminalRef.current);
-            fitAddon.fit();
-        }
-
         const resizeListener = () => {
-            if (term) {
-                fitAddon.fit();
-            }
+            fitAddon.fit();
         };
-
-        // Add event listener for resize
         window.addEventListener("resize", resizeListener);
-
-        // Write initial message after a slight delay to avoid race conditions
-        setTimeout(() => {
-            term.writeln('Welcome to CryptoForge Terminal');
-            term.write(PROMPT);
-        }, 10);
 
         term.onData((data) => {
             const code = data.charCodeAt(0);
@@ -320,6 +307,26 @@ export function Tool({isDark}) {
             }
         });
 
+        if (terminalRef.current) {
+            requestAnimationFrame(() => {
+                terminalRef.current.innerHTML = '';
+                term.open(terminalRef.current);
+                fitAddon.fit();
+
+                const observer = new ResizeObserver(() => {
+                    fitAddon.fit();
+                });
+                observer.observe(terminalRef.current);
+
+                term.writeln('Welcome to CryptoForge Tool (TIP: help)');
+                term.write(PROMPT);
+
+                return () => {
+                    observer.disconnect();
+                };
+            });
+        }
+
         return () => {
             term.dispose(); // cleanup
             window.removeEventListener("resize", resizeListener);
@@ -327,13 +334,13 @@ export function Tool({isDark}) {
     }, []);
 
     useEffect(() => {
-        termRef.current.options.theme = isDark ? darkTheme : lightTheme;
-    }, [isDark]);
+        termRef.current.options.theme = resolvedTheme ? darkTheme : lightTheme;
+    }, [resolvedTheme]);
 
 
     return (
         <div className="flex h-full w-full">
-            {/* Terminal */}
+            {/* Tool */}
             <div
                 ref={terminalRef}
                 className="w-2/3 h-full border-t-2 border-r-2 border-indigo-700 dark:border-indigo-700 p-2"
@@ -346,12 +353,12 @@ export function Tool({isDark}) {
                     <div className="flex justify-end space-x-4 mt-2">
                         <UploadOutlined
                             onClick={uploadInput}
-                            style={{ fontSize: 20, cursor: 'pointer', color: isDark ? '#fff' : '#000' }}
+                            style={{ fontSize: 20, cursor: 'pointer', color: theme ? '#fff' : '#000' }}
                             title="Upload input from a file"
                         />
                         <RestOutlined
                             onClick={cleanTextarea}
-                            style={{ fontSize: 20, cursor: 'pointer', color: isDark ? '#fff' : '#000' }}
+                            style={{ fontSize: 20, cursor: 'pointer', color: theme ? '#fff' : '#000' }}
                             title="Clean input"
                         />
                     </div>
@@ -371,22 +378,22 @@ export function Tool({isDark}) {
                     <div className="flex justify-end space-x-4">
                         <ArrowUpOutlined
                             onClick={outputToInput}
-                            style={{ fontSize: 20, cursor: 'pointer', color: isDark ? '#fff' : '#000' }}
+                            style={{ fontSize: 20, cursor: 'pointer', color: theme ? '#fff' : '#000' }}
                             title="Put output to input"
                         />
                         <CopyOutlined
                             onClick={copyRaw}
-                            style={{ fontSize: 20, cursor: 'pointer', color: isDark ? '#fff' : '#000' }}
+                            style={{ fontSize: 20, cursor: 'pointer', color: theme ? '#fff' : '#000' }}
                             title="Copy raw output"
                         />
                         <DownloadOutlined
                             onClick={downloadOutput}
-                            style={{ fontSize: 20, cursor: 'pointer', color: isDark ? '#fff' : '#000' }}
+                            style={{ fontSize: 20, cursor: 'pointer', color: theme ? '#fff' : '#000' }}
                             title="Download output as a file"
                         />
                         <RestOutlined
                             onClick={cleanTextarea}
-                            style={{ fontSize: 20, cursor: 'pointer', color: isDark ? '#fff' : '#000' }}
+                            style={{ fontSize: 20, cursor: 'pointer', color: theme ? '#fff' : '#000' }}
                             title="Clean output"
                         />
                     </div>

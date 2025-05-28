@@ -1,7 +1,7 @@
 export function meta() {
     return [
         { title: "About us" },
-        { name: "description", content: "Learn more about this tool and its purpose." },
+        { name: "description", content: "Learn more about this ssr and its purpose." },
     ];
 }
 
