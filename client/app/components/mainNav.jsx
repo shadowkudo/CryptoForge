@@ -6,6 +6,11 @@ import { SunOutlined, MoonOutlined } from "@ant-design/icons";
 export default function MainNav({ isDark, handleChange }) {
     return (
         <nav className="p-4 flex gap-4 items-center justify-between bg-[#9172FF] dark:text-black text-white border-b border-gray-300 dark:border-gray-700">
+            <div className="flex">
+                <Link to="/" className="text-lg font-semibold hover:underline">
+                    CryptoForge
+                </Link>
+            </div>
             <div className="flex gap-4">
                 <Link to="/tool" className="font-bold hover:underline">
                     Tool

@@ -37,7 +37,7 @@ export default function ErrorPage() {
                     <h1 className="text-3xl font-bold mb-4">{message}</h1>
                     <p className="mb-4">{details}</p>
                     {stack && (
-                        <pre className="bg-black bg-opacity-25 p-4 rounded overflow-x-auto text-sm whitespace-pre-wrap">
+                        <pre className="bg-red-500 bg-opacity-25 p-4 rounded overflow-x-auto text-sm whitespace-pre-wrap">
                             <code>{stack}</code>
                         </pre>
                     )}
