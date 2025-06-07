@@ -314,8 +314,8 @@ export function Term({ theme }) {
                 if (cmd) {
                     commandHistory.current.push(cmd);
                     historyIndex.current = commandHistory.current.length;
+                    handleCommand(cmd);
                 }
-                handleCommand(cmd);
                 inputBuffer.current = '';
                 cursorPos.current = 0;
                 term.write(PROMPT);
@@ -404,14 +404,14 @@ export function Term({ theme }) {
             {/* Tool */}
             <div
                 ref={terminalRef}
-                className="w-2/3 h-full border-t-2 border-r-2 border-indigo-700 dark:border-indigo-700 p-2"
+                className="w-2/3 h-full border-r-2 border-[#9172FF] p-2"
             ></div>
 
             {/* Right Panel: Input & Output textareas */}
             <div className="w-1/3 h-full flex flex-col pl-2 space-y-2 mr-4">
                 {/* Input Area */}
-                <div className="flex-1 flex flex-col space-y-1">
-                    <div className="flex justify-end space-x-4 mt-2">
+                <div className="flex-1 flex flex-col space-y-1 mt-2">
+                    <div className="flex justify-end space-x-4">
                         <UploadOutlined
                             onClick={uploadInput}
                             style={{ fontSize: 20, cursor: 'pointer', color: theme ? '#fff' : '#000' }}
@@ -435,7 +435,7 @@ export function Term({ theme }) {
                 </div>
 
                 {/* Output Area */}
-                <div className="flex-1 flex flex-col space-y-1">
+                <div className="flex-1 flex flex-col space-y-1 mb-2">
                     <div className="flex justify-end space-x-4">
                         <ArrowUpOutlined
                             onClick={outputToInput}
