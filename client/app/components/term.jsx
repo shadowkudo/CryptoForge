@@ -9,6 +9,7 @@ import {
     DownloadOutlined, RestOutlined,
     UploadOutlined
 } from '@ant-design/icons';
+import {message} from "antd";
 
 const PROMPT = '$> ';
 
@@ -207,25 +208,85 @@ export function Term({ theme }) {
     };
 
     const downloadOutput = () => {
-        //TODO
+        if (!outputText.trim()) {
+            message.warning("Output is empty.");
+            return;
+        }
+
+        try {
+            const blob = new Blob([outputText], { type: "text/plain" });
+            const url = URL.createObjectURL(blob);
+
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "output.txt";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            URL.revokeObjectURL(url);
+            message.success("Download triggered.");
+        } catch (err) {
+            message.error("Failed to trigger download.");
+        }
     };
 
-    const copyRaw = () => {
-        //TODO
+    const copyRaw = async () => {
+        try {
+            await navigator.clipboard.writeText(outputText);
+            message.success("Output copied to clipboard.");
+        } catch (err) {
+            message.error("Failed to copy.");
+        }
     };
 
     const outputToInput = () => {
-        //TODO
+        if (!outputText.trim()) { // if output is empty
+            return;
+        }
+
+        setInputText(outputText);
+        inputTextRef.current = outputText;
+        setOutputText('');
     };
 
     const uploadInput = () => {
-        //TODO
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = ".txt";
+
+        input.onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (file.size > 100 * 1024) {
+                message.error("File too large (max 100 KB).");
+                return;
+            }
+
+            try {
+                const text = await file.text();
+                setInputText(text);
+                inputTextRef.current = text;
+                message.success("File loaded into input.");
+            } catch (err) {
+                message.error("Failed to read file.");
+            }
+        };
+
+        input.click();
     };
 
-    const cleanTextarea = () => {
-        //TODO
-    };
+    const cleanTextarea = (target = 'both') => {
+        if (target === 'input' || target === 'both') {
+            setInputText('');
+            inputTextRef.current = '';
+        }
 
+        if (target === 'output' || target === 'both') {
+            setOutputText('');
+        }
+    };
 
     useEffect(() => {
         // initialize terminal once
@@ -357,7 +418,7 @@ export function Term({ theme }) {
                             title="Upload input from a file"
                         />
                         <RestOutlined
-                            onClick={cleanTextarea}
+                            onClick={() => cleanTextarea('input')}
                             style={{ fontSize: 20, cursor: 'pointer', color: theme ? '#fff' : '#000' }}
                             title="Clean input"
                         />
@@ -392,7 +453,7 @@ export function Term({ theme }) {
                             title="Download output as a file"
                         />
                         <RestOutlined
-                            onClick={cleanTextarea}
+                            onClick={() => cleanTextarea('output')}
                             style={{ fontSize: 20, cursor: 'pointer', color: theme ? '#fff' : '#000' }}
                             title="Clean output"
                         />
