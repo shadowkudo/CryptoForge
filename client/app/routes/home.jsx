@@ -3,7 +3,7 @@ import { Link } from "react-router";
 export function meta() {
     return [
         { title: "CryptoForge" },
-        { name: "description", content: "Forge your message!" },
+        { name: "description", content: "Homepage" },
     ];
 }
 
@@ -19,10 +19,11 @@ export default function Home() {
                 coder’s seat.
             </p>
 
-            {/* Wrapper to limit collapse width */}
+            {/* Wrapper */}
             <div className="w-full max-w-4xl mx-auto">
-                {/* Collapse 1 */}
-                <div tabIndex={0} className="collapse collapse-arrow bg-gray-400 dark:bg-base-100 border-base-300 border m-2">
+                {/* Idea */}
+                <div className="collapse collapse-arrow bg-gray-400 dark:bg-base-100 border-base-300 border m-2">
+                    <input type="checkbox" />
                     <div className="collapse-title font-semibold">
                         Craft your own encrypted messages by hand — just like a real cryptographer.
                     </div>
@@ -32,8 +33,9 @@ export default function Home() {
                     </div>
                 </div>
 
-                {/* Collapse 2 */}
-                <div tabIndex={1} className="collapse collapse-arrow bg-gray-400 dark:bg-base-100 border-base-300 border m-2">
+                {/* Algo */}
+                <div className="collapse collapse-arrow bg-gray-400 dark:bg-base-100 border-base-300 border m-2">
+                    <input type="checkbox" />
                     <div className="collapse-title font-semibold">Supported Algorithms</div>
                     <div className="collapse-content text-sm">
                         <ul className="list-disc list-inside">
@@ -44,8 +46,9 @@ export default function Home() {
                     </div>
                 </div>
 
-                {/* Collapse 3 */}
-                <div tabIndex={2} className="collapse collapse-arrow bg-gray-400 dark:bg-base-100 border-base-300 border m-2">
+                {/* Why */}
+                <div className="collapse collapse-arrow bg-gray-400 dark:bg-base-100 border-base-300 border m-2">
+                    <input type="checkbox" />
                     <div className="collapse-title font-semibold">Why Use CryptoForge?</div>
                     <div className="collapse-content text-sm">
                         <ul className="list-disc list-inside">
@@ -56,15 +59,14 @@ export default function Home() {
                     </div>
                 </div>
 
-                {/* Collapse 4 */}
-                <div tabIndex={3} className="collapse collapse-open bg-gray-400 dark:bg-base-100 border-base-300 border m-2">
-                    <div className="collapse-title font-semibold">
-                        Have a Problem?
-                    </div>
+                {/* Problem */}
+                <div className="collapse collapse-arrow bg-gray-400 dark:bg-base-100 border-base-300 border m-2">
+                    <input type="checkbox" />
+                    <div className="collapse-title font-semibold">Have a Problem?</div>
                     <div className="collapse-content text-sm">
                         Visit the{" "}
                         <Link
-                            to="/about"
+                            to="/about#contact"
                             className="underline text-indigo-600 dark:text-[#9172FF] hover:text-indigo-800 hover:dark:text-indigo-600 transition"
                         >
                             Contact
@@ -80,10 +82,10 @@ export default function Home() {
                     to="/tool"
                     className="px-6 py-2 rounded bg-[#9172FF] text-white dark:text-black font-medium hover:bg-indigo-600 transition"
                 >
-                    Go to the terminal
+                    Go to the Terminal
                 </Link>
                 <Link
-                    to="/about"
+                    to="/about#contact"
                     className="px-6 py-2 rounded bg-[#9172FF] text-white dark:text-black font-medium hover:bg-indigo-600 transition"
                 >
                     Read More
