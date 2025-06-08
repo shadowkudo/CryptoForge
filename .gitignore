@@ -1,4 +1,4 @@
 node_modules
 .idea
-client/.react-router
-*/node_modules
+.react-router
+build
