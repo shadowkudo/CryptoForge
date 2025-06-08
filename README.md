@@ -47,8 +47,12 @@ npm run dev
 
 For production (uses the port `2705`):
 ```sh
+npm run build
 npm run prod
 ```
+
+> [!WARNING]
+> In file `app/components/term/core.jsx`, the import of `xterm.js` varies depending on the runtime profile. By default, it is set up for development (`dev`).
 
 ## Contributing
 Contributions are welcome! Here’s how to get involved:
