@@ -85,7 +85,7 @@ export default function Home() {
                     Go to the Terminal
                 </Link>
                 <Link
-                    to="/about#contact"
+                    to="/about"
                     className="px-6 py-2 rounded bg-[#9172FF] text-white dark:text-black font-medium hover:bg-indigo-600 transition"
                 >
                     Read More

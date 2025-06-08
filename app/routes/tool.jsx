@@ -1,4 +1,4 @@
-import { Term } from "../components/term.jsx";
+import Term from "../components/term/term";
 import {useOutletContext} from "react-router";
 
 export function meta() {
