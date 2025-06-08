@@ -1,9 +1,11 @@
 import { ceasarEncrypt, ceasarDecrypt } from '../../algorithms/ceasar';
 import { vigenereEncrypt, vigenereDecrypt } from '../../algorithms/vigenere';
+import { aesEncrypt, aesDecrypt } from '../../algorithms/aes';
+import { desEncrypt, desDecrypt } from '../../algorithms/des';
 
 export const handleCommandFactory = (term, inputTextRef, setOutputText) => {
     const write = (text) => term.writeln(text);
-    const algorithms = ['ceasar', 'vigenere'];
+    const algorithms = ['ceasar', 'vigenere', 'aes', 'des'];
 
     return (command) => {
         const cleanCmd = command.trim();
@@ -39,11 +41,15 @@ export const handleCommandFactory = (term, inputTextRef, setOutputText) => {
             if (cleanCmd.startsWith('encrypt')) {
                 if (algo === 'ceasar') result = ceasarEncrypt(message, key);
                 else if (algo === 'vigenere') result = vigenereEncrypt(message, key);
+                else if (algo === 'aes') result = aesEncrypt(message, key);
+                else if (algo === 'des') result = desEncrypt(message, key);
                 else return write(`Unknown algorithm: ${algo}`);
                 write('Cipher done.');
             } else {
                 if (algo === 'ceasar') result = ceasarDecrypt(message, key);
                 else if (algo === 'vigenere') result = vigenereDecrypt(message, key);
+                else if (algo === 'aes') result = aesDecrypt(message, key);
+                else if (algo === 'des') result = desDecrypt(message, key);
                 else return write(`Unknown algorithm: ${algo}`);
                 write('Decipher done.');
             }

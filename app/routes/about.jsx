@@ -111,14 +111,28 @@ export default function About() {
                     <p className="text-lg leading-relaxed mb-2">
                         Understanding the theory behind the ciphers strengthens your cryptographic intuition.
                     </p>
+
                     <h3 className="text-xl font-semibold mt-4 mb-1">Caesar Cipher</h3>
                     <p className="text-lg leading-relaxed mb-3">
                         A simple substitution cipher that shifts each letter by a fixed number of positions.
                         It’s easy to crack but perfect for learning basics of encryption and modular arithmetic.
                     </p>
+
                     <h3 className="text-xl font-semibold mt-4 mb-1">Vigenère Cipher</h3>
                     <p className="text-lg leading-relaxed mb-3">
                         Uses a keyword to apply multiple Caesar shifts, making it stronger and a great introduction to polyalphabetic ciphers.
+                    </p>
+
+                    <h3 className="text-xl font-semibold mt-4 mb-1">AES (Advanced Encryption Standard)</h3>
+                    <p className="text-lg leading-relaxed mb-3">
+                        A symmetric block cipher widely used across the globe. AES encrypts data in fixed-size blocks (usually 128 bits)
+                        and supports key sizes of 128, 192, or 256 bits. It's fast, secure, and the current standard for modern encryption.
+                    </p>
+
+                    <h3 className="text-xl font-semibold mt-4 mb-1">DES (Data Encryption Standard)</h3>
+                    <p className="text-lg leading-relaxed mb-3">
+                        An older symmetric-key algorithm that operates on 64-bit blocks and uses a 56-bit key. While historically important,
+                        DES is now considered insecure due to its small key size and is mainly of academic or legacy interest.
                     </p>
 
                     <div role="alert" className="alert alert-info mb-2">
@@ -134,13 +148,14 @@ export default function About() {
                     <h2 className="text-2xl font-bold mb-2">Theme: Light & Dark Mode</h2>
                     <p className="text-lg leading-relaxed mb-3">
                         This application supports both <strong>light</strong> and <strong>dark</strong> themes to provide a comfortable user experience.
+                        By default, it automatically matches your <strong>system’s preferred color scheme</strong>.
                     </p>
                     <ul className="list-disc pl-6 mb-4">
                         <li>Light mode uses bright, high-contrast colors for daytime usage.</li>
                         <li>Dark mode uses softer tones to reduce eye strain, especially at night.</li>
                     </ul>
                     <p className="text-lg leading-relaxed mb-3">
-                        Your theme preference is temporarily stored in an <strong>encrypted session cookie</strong> (named color-scheme). This means:
+                        Your theme preference is temporarily stored in an <strong>encrypted session cookie</strong> (named <code>color-scheme</code>). This means:
                     </p>
                     <ul className="list-disc pl-6 mb-4">
                         <li>Your theme is remembered while your browser tab remains open.</li>

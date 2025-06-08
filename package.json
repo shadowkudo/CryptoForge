@@ -16,6 +16,7 @@
     "@xterm/addon-fit": "^0.10.0",
     "@xterm/xterm": "^5.4.0",
     "antd": "^5.25.1",
+    "crypto-js": "^4.2.0",
     "daisyui": "^5.0.40",
     "isbot": "^5.1.27",
     "js-cookie": "^3.0.5",
