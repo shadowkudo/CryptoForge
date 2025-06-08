@@ -1,4 +1,3 @@
-import React from "react";
 import {CopyrightOutlined} from "@ant-design/icons";
 
 export default function Footer() {

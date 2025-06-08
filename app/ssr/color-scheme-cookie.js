@@ -9,7 +9,7 @@ const colorSchemeCookie = createCookie("color-scheme", {
     path: "/",
     sameSite: "strict",
     httpOnly: true,
-    secrets: [process.env.COOKIE_SECRET || "theBestPa$$w0rdEverThoughtOf!"],
+    secrets: ["theBestPa$$w0rdEverThoughtOf!"], // this secret will be moved to an env variable the day the project is put on a server for prod
 });
 
 export const typedColorSchemeCookie = createTypedCookie({

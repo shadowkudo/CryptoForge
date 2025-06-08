@@ -4,11 +4,10 @@ import {
     Outlet,
     Scripts,
     ScrollRestoration,
-    useRouteLoaderData, data, useFetcher, useLoaderData,
+    useRouteLoaderData, data, useFetcher,
 } from "react-router";
-import React, {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import "./app.css";
-//import '@xterm/xterm/css/xterm.css'; // comment for dev
 import '@ant-design/v5-patch-for-react-19';
 import {getColorScheme, schema, setColorScheme} from "./ssr/color-scheme-cookie.js";
 import ErrorPage from "./components/errorPage.jsx";
@@ -32,7 +31,7 @@ export const links = () => [
     {rel: "preconnect", href: "https://fonts.googleapis.com"},
     {rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous"},
     {rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"},
-    {rel: "stylesheet", href: "node_modules/@xterm/xterm/css/xterm.css"}, // comment for prod
+    {rel: "stylesheet", href: "/xterm.css"},
 ];
 
 export const meta = () => [

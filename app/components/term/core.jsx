@@ -1,6 +1,8 @@
-import {Terminal} from "@xterm/xterm"; // comment for prod
-/*import xtermPkg from "@xterm/xterm"; // comment for dev
-const { Terminal } = xtermPkg;*/
+//import {Terminal} from "@xterm/xterm"; // comment for prod
+
+import xtermPkg from "@xterm/xterm"; // comment for dev
+const { Terminal } = xtermPkg; // comment for dev
+
 import {FitAddon} from "@xterm/addon-fit/src/FitAddon.js";
 import {PROMPT} from './helpers'
 
