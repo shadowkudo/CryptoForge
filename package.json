@@ -5,7 +5,7 @@
   "scripts": {
     "build": "react-router build",
     "dev": "react-router dev",
-    "start": "PORT=2705 react-router-serve ./build/server/index.js"
+    "prod": "PORT=2705 react-router-serve ./build/server/index.js"
   },
   "dependencies": {
     "@ant-design/icons": "^5.6.1",

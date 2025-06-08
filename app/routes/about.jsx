@@ -90,6 +90,11 @@ export default function About() {
                         <span>When the cursor is in the terminal, browser keyboard shortcuts won’t work. Click outside the terminal to regain normal browser keyboard functionality.</span>
                     </div>
 
+                    <h3 className="font-semibold text-lg mb-1">Input Length Limit</h3>
+                    <p className="mb-4">
+                        The terminal input is limited to a maximum length per line (typically around 77 characters) based on the terminal width and prompt size. This ensures proper display without overflow or wrapping issues.
+                    </p>
+
                     <h3 className="font-semibold text-lg mb-1">Input Zone</h3>
                     <ul className="list-disc pl-6 mb-4">
                         <li>Freely write your plaintext or ciphertext here.</li>

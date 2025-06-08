@@ -31,9 +31,12 @@ export default function Term({ theme }) {
         if (targetOffset > 0) term.write('\x1b[' + targetOffset + 'D');
     };
 
+
     useEffect(() => {
         const term = initializeTerminal(terminalRef.current, resolvedTheme ? darkTheme : lightTheme);
         termRef.current = term;
+
+        const maxInputLength = term.cols - PROMPT.length;
 
         const handleCommand = handleCommandFactory(term, inputTextRef, setOutputText);
         term.onData((data) => {
@@ -73,12 +76,20 @@ export default function Term({ theme }) {
                     historyIndex.current = commandHistory.current.length;
                     replaceInput('');
                 }
-            } else if (data >= ' ' && data <= '~') {
-                inputBuffer.current = inputBuffer.current.slice(0, cursorPos.current) + data + inputBuffer.current.slice(cursorPos.current);
-                cursorPos.current++;
-                rewriteInput();
+            } else if (data.length > 0 && [...data].every(c => c >= ' ' && c <= '~')) { // Printable chars
+                if (inputBuffer.current.length + data.length <= maxInputLength) {
+                    inputBuffer.current =
+                        inputBuffer.current.slice(0, cursorPos.current) +
+                        data +
+                        inputBuffer.current.slice(cursorPos.current);
+                    cursorPos.current += data.length;
+                    rewriteInput();
+                } else {
+                    term.write('\x07'); // bell on overflow
+                }
             }
         });
+        term.write(PROMPT);
 
         return () => term.dispose();
     }, []);
