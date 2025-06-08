@@ -64,6 +64,7 @@ This project leverages the following open-source libraries and frameworks:
 - [DaisyUI](https://daisyui.com/) — Tailwind CSS component library
 - [Tailwind CSS](https://tailwindcss.com/) — Utility-first CSS framework
 - [React Router](https://reactrouter.com/) — Declarative routing for React applications
+- [crypto-js](https://github.com/brix/crypto-js) — JavaScript library of crypto standards and ciphers
 
 A big thanks to these projects and their communities for enabling this app.
 

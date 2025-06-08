@@ -9,18 +9,22 @@ Create an interactive web application that allows users to:
 - **Encrypt or decrypt** this content via a **terminal-style interface**
 - Use various **cryptographic algorithms**
 - Display the **result in a scrollable, exportable output area**
-- Show a **progress bar during processing**
 
 ---
 
-## Tech Stack
+## Tech Stack for Front-end
 
-| Frontend (Client Side)      | Backend (Server Side)         |
-|-----------------------------|-------------------------------|
-| React.js                    | Node.js + Express             |
-| xterm.js                    | crypto-js                     |
-| Tailwind CSS                | Multer (for file upload)      |
-| Axios                       | CORS, Body Parser             |
+| Technology          | Description                                  | Link                                  |
+|---------------------|----------------------------------------------|-------------------------------------|
+| xterm.js            | Terminal emulator for the web                | [xterm.js](https://xtermjs.org/)    |
+| Ant Design (antd)   | UI components and icons                       | [Ant Design](https://ant.design/)    |
+| DaisyUI             | Tailwind CSS component library                | [DaisyUI](https://daisyui.com/)      |
+| Tailwind CSS        | Utility-first CSS framework                    | [Tailwind CSS](https://tailwindcss.com/) |
+| React Router        | Declarative routing for React applications    | [React Router](https://reactrouter.com/) |
+| crypto-js           | JavaScript crypto library with cipher implementations | [crypto-js](https://github.com/brix/crypto-js) |
+| Node.js             | JavaScript runtime environment                | [Node.js](https://nodejs.org/)       |
+| npm                 | Node package manager                          | [npm](https://www.npmjs.com/)        |
+
 
 ---
 
@@ -39,7 +43,6 @@ displayed in the input area)
   clear
   ```
 - **Output area** showing results (scrollable, copyable, exportable as `.txt`)
-- **Progress bar** displayed only during encryption/decryption
 
 ---
 
@@ -51,25 +54,15 @@ displayed in the input area)
 - Returns: the encrypted/decrypted output
 - Includes error handling and response time management
 
+> [!NOTE]
+> To be implemented only if time allows as front-end is enough for the project.
 ---
 
 ### Supported Algorithms
 - Caesar Cipher (key = integer)
 - Vigenère Cipher (key = word)
-- Base64
 - AES (key = string, fixed mode ECB or CBC)
 - ...possibly others?
-
----
-
-## Project Timeline
-
-| Week       | Goal                | Details                                      |
-|------------|---------------------|----------------------------------------------|
-| Week 1     | Mockups & Base Setup | Initialize React + Tailwind + xterm.js, basic UI |
-| Week 2     | Terminal & Commands | Implement command parsing, display raw result |
-| Week 3     | Backend Integration | Build API, connect to frontend, handle encryption |
-| Week 4     | Final Touches       | Add file upload, progress bar, export feature, testing, deployment |
 
 ---
 
