@@ -53,7 +53,7 @@ export default function About() {
                 {/* Sections */}
 
                 {/* Introduction */}
-                <div id="intro" className="bg-gray-400 dark:bg-base-100 border border-base-300 rounded-md p-6 mb-8">
+                <div id="intro" className="bg-gray-400 dark:bg-gray-700 border border-gray-500 dark:border-gray-600 rounded-md p-6 mb-8">
                     <h2 className="text-2xl font-bold mb-2">Introduction</h2>
                     <ul className="list-disc pl-6 mb-4">
                         <li>CryptoForge is a hands-on encryption tool with a terminal interface.</li>
@@ -63,11 +63,11 @@ export default function About() {
                 </div>
 
                 {/* Terminal */}
-                <div id="terminal" className="bg-gray-400 dark:bg-base-100 border border-base-300 rounded-md p-6 mb-8">
+                <div id="terminal" className="bg-gray-400 dark:bg-gray-700 border border-gray-500 dark:border-gray-600 rounded-md p-6 mb-8">
                     <h2 className="text-2xl font-bold mb-2">Terminal</h2>
 
                     <p className="text-lg mb-4">
-                        Typing <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">help</code> will show the commands you can use.
+                        Typing <code className="bg-gray-200 dark:bg-gray-500 px-1 rounded">help</code> will show the commands you can use.
                     </p>
 
                     <div role="alert" className="alert alert-warning mb-2">
@@ -118,7 +118,7 @@ export default function About() {
                 </div>
 
                 {/* Cipher Theory */}
-                <div id="theory" className="bg-gray-400 dark:bg-base-100 border border-base-300 rounded-md p-6 mb-8">
+                <div id="theory" className="bg-gray-400 dark:bg-gray-700 border border-gray-500 dark:border-gray-600 rounded-md p-6 mb-8">
                     <h2 className="text-2xl font-bold mb-2">Cipher Theory</h2>
                     <p className="text-lg leading-relaxed mb-2">
                         Understanding the theory behind the ciphers strengthens your cryptographic intuition.
@@ -156,7 +156,7 @@ export default function About() {
                 </div>
 
                 {/* Theme Info */}
-                <div id="theme" className="bg-gray-400 dark:bg-base-100 border border-base-300 rounded-md p-6 mb-8">
+                <div id="theme" className="bg-gray-400 dark:bg-gray-700 border border-gray-500 dark:border-gray-600 rounded-md p-6 mb-8">
                     <h2 className="text-2xl font-bold mb-2">Theme: Light & Dark Mode</h2>
                     <p className="text-lg leading-relaxed mb-3">
                         This application supports both <strong>light</strong> and <strong>dark</strong> themes to provide a comfortable user experience.
@@ -177,7 +177,7 @@ export default function About() {
                 </div>
 
                 {/* Contact */}
-                <div id="contact" className="bg-gray-400 dark:bg-base-100 border border-base-300 rounded-md p-6 mb-8">
+                <div id="contact" className="bg-gray-400 dark:bg-gray-700 border border-gray-500 dark:border-gray-600 rounded-md p-6 mb-8">
                     <h2 className="text-2xl font-bold mb-2">Contact</h2>
                     <p className="text-lg leading-relaxed mb-4">
                         Have issues or ideas? Reach out through:
@@ -207,7 +207,7 @@ export default function About() {
                 </div>
 
                 {/* Credits */}
-                <div id="credits" className="bg-gray-400 dark:bg-base-100 border border-base-300 rounded-md p-6 mb-8">
+                <div id="credits" className="bg-gray-400 dark:bg-gray-700 border border-gray-500 dark:border-gray-600 rounded-md p-6 mb-8">
                     <h2 className="text-2xl font-bold mb-2">Credits</h2>
                     <p className="text-lg leading-relaxed mb-2">
                         Developed by 2 people for a school project.

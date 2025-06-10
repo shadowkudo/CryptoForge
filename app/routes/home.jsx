@@ -33,7 +33,7 @@ export default function Home() {
             <div className="flex w-full gap-4 overflow-x-auto px-2">
                 {/* Idea */}
                 <div className="flex-1 min-w-[250px]">
-                    <div className="collapse collapse-arrow bg-gray-400 dark:bg-base-100 border-base-300 border">
+                    <div className="collapse collapse-arrow bg-gray-400 dark:bg-gray-700 border-gray-500 dark:border-gray-600 border">
                         <input type="checkbox" />
                         <div className="collapse-title font-semibold">
                             Craft your own encrypted messages by hand
@@ -46,7 +46,7 @@ export default function Home() {
 
                 {/* Algo */}
                 <div className="flex-1 min-w-[250px]">
-                    <div className="collapse collapse-arrow bg-gray-400 dark:bg-base-100 border-base-300 border">
+                    <div className="collapse collapse-arrow bg-gray-400 dark:bg-gray-700 border-gray-500 dark:border-gray-600 border">
                         <input type="checkbox" />
                         <div className="collapse-title font-semibold">Supported Algorithms</div>
                         <div className="collapse-content text-sm">
@@ -62,7 +62,7 @@ export default function Home() {
 
                 {/* Why */}
                 <div className="flex-1 min-w-[250px]">
-                    <div className="collapse collapse-arrow bg-gray-400 dark:bg-base-100 border-base-300 border">
+                    <div className="collapse collapse-arrow bg-gray-400 dark:bg-gray-700 border-gray-500 dark:border-gray-600 border">
                         <input type="checkbox" />
                         <div className="collapse-title font-semibold">Why Use CryptoForge?</div>
                         <div className="collapse-content text-sm">
@@ -77,7 +77,7 @@ export default function Home() {
 
                 {/* Problem */}
                 <div className="flex-1 min-w-[250px]">
-                    <div className="collapse collapse-arrow bg-gray-400 dark:bg-base-100 border-base-300 border">
+                    <div className="collapse collapse-arrow bg-gray-400 dark:bg-gray-700 border-gray-500 dark:border-gray-600 border">
                         <input type="checkbox" />
                         <div className="collapse-title font-semibold">Have a Problem?</div>
                         <div className="collapse-content text-sm">
